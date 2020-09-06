@@ -1,0 +1,22 @@
+FROM ruby:2.7.1
+
+ENV LANG C.UTF-8
+
+RUN mkdir /db_experiment
+WORKDIR /db_experiment
+
+RUN set -ex && \
+    apt-get update -qq && \
+    apt-get install -y sudo && \
+    : "Install node.js" && \
+    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - && \
+    apt-get update -qq && \
+    apt-get install -y nodejs && \
+    : "Install yarn" && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
+    apt-get update -qq && \
+    apt-get install -y yarn
+
+ADD . /db_experiment
+RUN bundle install

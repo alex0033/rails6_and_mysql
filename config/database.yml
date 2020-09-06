@@ -11,11 +11,12 @@
 #
 default: &default
   adapter: mysql2
-  encoding: utf8mb4
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: root
-  password:
-  socket: /var/run/mysqld/mysqld.sock
+  encoding: utf8
+  collation: utf8_general_ci
+  pool: 5
+  host: db
+  username: <%= ENV['MYSQL_USERNAME'] || 'root' %>
+  password: <%= ENV['MYSQL_PASSWORD'] || 'password' %>
 
 development:
   <<: *default
@@ -50,5 +51,4 @@ test:
 production:
   <<: *default
   database: db_experiment_production
-  username: db_experiment
-  password: <%= ENV['DB_EXPERIMENT_DATABASE_PASSWORD'] %>
+  password: <%= ENV['JAWSDB_URL']&.sub('mysql://', 'mysql2://') %>
