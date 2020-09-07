@@ -16,9 +16,9 @@ jobs:
           command: |
             set -x
             docker-compose up -d
-            docker exec potepanec_app curl -4 --retry 10 --retry-delay 3 --retry-connrefused http://localhost:3000
+            docker exec rails_web curl -4 --retry 10 --retry-delay 3 --retry-connrefused http://localhost:3000
       - run:
-          name: Setup database #後ほどdb:seedsで確認
+          name: Setup database
           command: |
             docker-compose exec rails_web rails db:create
             docker-compose exec rails_web rails db:migrate
