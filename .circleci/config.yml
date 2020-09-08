@@ -21,7 +21,7 @@ jobs:
             docker-compose -f docker-compose.ci.yml exec web rails db:schema:load
       - run:
           name: Run rspec
-          command: sudo docker-compose exec web rspec
+          command: docker-compose exec web rspec
 
   rubocop:
     working_directory: ~/rails6_and_mysql
