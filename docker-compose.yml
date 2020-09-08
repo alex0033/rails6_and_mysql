@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: rails_web
     volumes:
-      - .:/db_experiment
+      - .:/rails6_and_mysql
     ports:
       - "3000:3000"
     stdin_open: true
