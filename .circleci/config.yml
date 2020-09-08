@@ -8,24 +8,20 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Setup environment variable
-          command: |
-            echo "export COMPOSE_FILE=docker-compose.ci.yml" >> $BASH_ENV
-      - run:
           name: Start containers and verify it is working
           command: |
             set -x
-            docker-compose up -d --build
-            docker exec rails_web curl -4 --retry 10 --retry-delay 3 --retry-connrefused http://localhost:3000
+            sudo docker-compose -f docker-compose.ci.yml up -d --build
+            sudo docker-compose ps
+            sudo docker exec rails_web_ci curl -4 --retry 10 --retry-delay 3 --retry-connrefused http://localhost:3000
       - run:
           name: Setup database
           command: |
-            docker-compose exec rails_web rails db:create
-            docker-compose exec rails_web rails db:migrate
-            docker-compose exec rails_web rails db:seed
+            sudo docker-compose -f docker-compose.ci.yml exec web rails db:create
+            sudo docker-compose -f docker-compose.ci.yml exec web rails db:schema:load
       - run:
           name: Run rspec
-          command: docker-compose exec rails_web bundle exec rspec
+          command: sudo docker-compose exec web rspec
 
   rubocop:
     working_directory: ~/rails6_and_mysql
@@ -51,7 +47,7 @@ jobs:
             - vendor/bundle
 
   # heroku_deploy:
-  #   working_directory: ~/potepanec
+  #   working_directory: ~/rails6_and_mysql
   #   docker:
   #     - image: sue445/heroku-cli
   #   steps:

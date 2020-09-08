@@ -3,7 +3,7 @@ version: '3'
 services:
   db:
     image: mysql:8.0
-    container_name: rails_mysql
+    container_name: rails_mysql_ci
     hostname: db
     ports:
       - "33306:3306"
@@ -16,7 +16,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ci
-    container_name: rails_web
+    container_name: rails_web_ci
     ports:
       - "3000:3000"
     stdin_open: true
