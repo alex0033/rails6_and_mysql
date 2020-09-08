@@ -74,7 +74,7 @@ jobs:
       - run:
           name: Run post-deploy tasks
           command: |
-            heroku run rails db:migrate
+            heroku run --app $APP_NAME_FOR_VERIFICATION rails db:migrate
 
   deploy_for_production:
     working_directory: ~/rails6_and_mysql
@@ -101,7 +101,7 @@ jobs:
       - run:
           name: Run post-deploy tasks
           command: |
-            heroku run rails db:migrate
+            heroku run --app $APP_NAME_FOR_PRODUCTION rails db:migrate
 
 workflows:
   version: 2.1
