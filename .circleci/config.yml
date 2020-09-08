@@ -49,7 +49,7 @@ jobs:
           paths:
             - vendor/bundle
 
-  deploy_for_verification:
+  deploy:
     working_directory: ~/rails6_and_mysql
     docker:
       - image: buildpack-deps:trusty
@@ -64,66 +64,32 @@ jobs:
               echo "Heroku is already installed. No operation was performed."
             fi
       - run:
-          name: App_name setting
+          name: App_name setting by Branch
           command: |
-            echo "export APP_NAME_FOR_VERIFICATION=rails6-mysql-sample" >> $BASH_ENV
+            if [ $CIRCLE_BRANCH == master ]; then
+              echo "export APP_NAME=rails6-mysql" >> $BASH_ENV
+            else
+              echo "export APP_NAME=rails6-mysql-sample" >> $BASH_ENV
+            fi
       - run:
           name: Deploy
           command: |
-            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME_FOR_VERIFICATION.git master
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git master
       - run:
           name: Set database, if necessary
           command: |
-            if [ -z "heroku config:get JAWSDB_URL --app $APP_NAME_FOR_VERIFICATION" ]; then
+            if [ -z "heroku config:get JAWSDB_URL --app $APP_NAME" ]; then
               echo "Database has been already set."
             else
-              heroku addons:create jawsdb --app $APP_NAME_FOR_VERIFICATION
-              DATABASE_URL=`heroku config:get JAWSDB_URL --app $APP_NAME_FOR_VERIFICATION`
+              heroku addons:create jawsdb --app $APP_NAME
+              DATABASE_URL=`heroku config:get JAWSDB_URL --app $APP_NAME`
               DATABASE_URL2=${DATABASE_URL/mysql/mysql2}
-              heroku config:set DATABASE_URL=$DATABASE_URL2 --app $APP_NAME_FOR_VERIFICATION
+              heroku config:set DATABASE_URL=$DATABASE_URL2 --app $APP_NAME
             fi
       - run:
           name: Run post-deploy tasks
           command: |
-            heroku run --app $APP_NAME_FOR_VERIFICATION rails db:migrate
-
-  deploy_for_production:
-    working_directory: ~/rails6_and_mysql
-    docker:
-      - image: buildpack-deps:trusty
-    steps:
-      - checkout
-      - run:
-          name: Install Heroku CLI, if necessary
-          command: |
-            if [[ $(command -v heroku) == "" ]]; then
-              curl https://cli-assets.heroku.com/install.sh | sh
-            else
-              echo "Heroku is already installed. No operation was performed."
-            fi
-      - run:
-          name: App_name setting
-          command: |
-            echo "export APP_NAME_FOR_PRODUCTION=rails6-mysql" >> $BASH_ENV
-      - run:
-          name: Deploy
-          command: |
-            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME_FOR_PRODUCTION.git master
-      - run:
-          name: Set database, if necessary
-          command: |
-            if [ -z "heroku config:get JAWSDB_URL --app $APP_NAME_FOR_PRODUCTION" ]; then
-              echo "Database has been already set."
-            else
-              heroku addons:create jawsdb --app $APP_NAME_FOR_PRODUCTION
-              DATABASE_URL=`heroku config:get JAWSDB_URL --app $APP_NAME_FOR_PRODUCTION`
-              DATABASE_URL2=${DATABASE_URL/mysql/mysql2}
-              heroku config:set DATABASE_URL=$DATABASE_URL2 --app $APP_NAME_FOR_PRODUCTION
-            fi
-      - run:
-          name: Run post-deploy tasks
-          command: |
-            heroku run --app $APP_NAME_FOR_PRODUCTION rails db:migrate
+            heroku run --app $APP_NAME rails db:migrate
 
 workflows:
   version: 2.1
@@ -131,17 +97,7 @@ workflows:
     jobs:
       - rspec
       - rubocop
-      - deploy_for_verification:
+      - deploy:
           requires:
             - rspec
             - rubocop
-          filters:
-            branches:
-              ignore: master
-      - deploy_for_production:
-          requires:
-            - rspec
-            - rubocop
-          filters:
-            branches:
-              only: master
