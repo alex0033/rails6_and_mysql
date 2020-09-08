@@ -78,7 +78,7 @@ jobs:
               echo "Database has been already set."
             else
               heroku addons:create jawsdb --app $APP_NAME_FOR_VERIFICATION
-              DATABASE_URL='heroku config:get JAWSDB_URL --app $APP_NAME_FOR_VERIFICATION'
+              DATABASE_URL=`heroku config:get JAWSDB_URL --app $APP_NAME_FOR_VERIFICATION`
               DATABASE_URL2=${DATABASE_URL/mysql/mysql2}
               heroku config:set DATABASE_URL=$DATABASE_URL2 --app $APP_NAME_FOR_VERIFICATION
             fi
@@ -116,7 +116,7 @@ jobs:
               echo "Database has been already set."
             else
               heroku addons:create jawsdb --app $APP_NAME_FOR_PRODUCTION
-              DATABASE_URL='heroku config:get JAWSDB_URL --app $APP_NAME_FOR_PRODUCTION'
+              DATABASE_URL=`heroku config:get JAWSDB_URL --app $APP_NAME_FOR_PRODUCTION`
               DATABASE_URL2=${DATABASE_URL/mysql/mysql2}
               heroku config:set DATABASE_URL=$DATABASE_URL2 --app $APP_NAME_FOR_PRODUCTION
             fi
