@@ -72,6 +72,17 @@ jobs:
           command: |
             git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME_FOR_VERIFICATION.git master
       - run:
+          name: Set database, if necessary
+          command: |
+            if [ -z "heroku config:get JAWSDB_URL --app $APP_NAME_FOR_VERIFICATION" ]; then
+              echo "Database has been already set."
+            else
+              heroku addons:create jawsdb --app $APP_NAME_FOR_VERIFICATION
+              DATABASE_URL='heroku config:get JAWSDB_URL --app $APP_NAME_FOR_VERIFICATION'
+              DATABASE_URL2=${DATABASE_URL/mysql/mysql2}
+              heroku config:set DATABASE_URL=$DATABASE_URL2 --app $APP_NAME_FOR_VERIFICATION
+            fi
+      - run:
           name: Run post-deploy tasks
           command: |
             heroku run --app $APP_NAME_FOR_VERIFICATION rails db:migrate
@@ -98,6 +109,17 @@ jobs:
           name: Deploy
           command: |
             git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME_FOR_PRODUCTION.git master
+      - run:
+          name: Set database, if necessary
+          command: |
+            if [ -z "heroku config:get JAWSDB_URL --app $APP_NAME_FOR_PRODUCTION" ]; then
+              echo "Database has been already set."
+            else
+              heroku addons:create jawsdb --app $APP_NAME_FOR_PRODUCTION
+              DATABASE_URL='heroku config:get JAWSDB_URL --app $APP_NAME_FOR_PRODUCTION'
+              DATABASE_URL2=${DATABASE_URL/mysql/mysql2}
+              heroku config:set DATABASE_URL=$DATABASE_URL2 --app $APP_NAME_FOR_PRODUCTION
+            fi
       - run:
           name: Run post-deploy tasks
           command: |
