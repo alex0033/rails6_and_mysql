@@ -11,14 +11,14 @@ jobs:
           name: Start containers and verify it is working
           command: |
             set -x
-            sudo docker-compose -f docker-compose.ci.yml up -d --build
-            sudo docker-compose ps
-            sudo docker exec rails_web_ci curl -4 --retry 10 --retry-delay 3 --retry-connrefused http://localhost:3000
+            docker-compose -f docker-compose.ci.yml up -d --build
+            docker-compose ps
+            docker exec rails_web_ci curl -4 --retry 10 --retry-delay 3 --retry-connrefused http://localhost:3000
       - run:
           name: Setup database
           command: |
-            sudo docker-compose -f docker-compose.ci.yml exec web rails db:create
-            sudo docker-compose -f docker-compose.ci.yml exec web rails db:schema:load
+            docker-compose -f docker-compose.ci.yml exec web rails db:create
+            docker-compose -f docker-compose.ci.yml exec web rails db:schema:load
       - run:
           name: Run rspec
           command: sudo docker-compose exec web rspec
